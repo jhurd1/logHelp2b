@@ -1,0 +1,32 @@
+/users/jamiehurd/desktop/temp/ (The place to search.)
+
+/users/jamiehurd/desktop/temp/logfile.txt (The log file output file.)
+
+c_logHelp2/ (The antecedent to every other file in the project [for Git].)
+
+
+
+---
+
+
+
+Files for git commit:
+
+ c_logHelp2/search.cpp
+ c_logHelp2/searchDirs.cpp
+ c_logHelp2/searchDriver.cpp
+ c_logHelp2/searchLogic.cpp
+
+ ---
+
+ Error tracking.
+
+ address
+c_logHelp2(8555,0x100194580) malloc: Heap corruption detected, free list is damaged at 0x6000026080c0
+*** Incorrect guard value: 0
+c_logHelp2(8555,0x100194580) malloc: *** set a breakpoint in malloc_error_break to debug
+c_logHelp2(8555,0x100194580) malloc: Heap corruption detected, free list is damaged at 0x6000026080c0
+*** Incorrect guard value: 0
+c_logHelp2(8555,0x100194580) malloc: Heap corruption detected, free list is damaged at 0x6000026080c0
+*** Incorrect guard value: 0
+Program ended with exit code: 9

@@ -1,0 +1,61 @@
+# Prerequisites
+*.d
+.DS_Store
+notes.txt
+*.xcodeproject/*.pbxproj
+*.xcodeproject
+*.xcuserstate
+c_logHelp2.xcodeproj/project.xcworkspace/xcuserdata/jamiehurd.xcuserdatad/UserInterfaceState.xcuserstate
+*.xcbkptlist
+*.scbkptlist
+.Trashes
+*.swp
+*.lock
+*~.nib
+DerivedData/
+build/
+*.pbxuser
+*.mode1v3
+*.perspectivev3
+*.xccheckout
+xcuserdata/
+*.moved-aside
+
+# Compiled Object files
+*.slo
+*.lo
+*.o
+*.obj
+
+# Precompiled Headers
+*.gch
+*.pch
+
+# Compiled Dynamic libraries
+*.so
+*.dylib
+*.dll
+
+# Fortran module files
+*.mod
+*.smod
+
+# Compiled Static libraries
+*.lai
+*.la
+*.a
+*.lib
+
+# Executables
+*.exe
+*.out
+*.app
+
+# Other
+*.log
+*.vscode/*.log
+.vscode/configurationCache.log
+.vscode/dryrun.log
+.vscode/targets.log
+*.vscode/
+
