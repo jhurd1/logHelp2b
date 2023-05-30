@@ -48,7 +48,7 @@ public:
 
     // Other Data Members
     int prompt(std::string &correspPath);
-    bool linehasthestring(const std::string& line, std::string stringToFind);
+    bool linehasthestring(std::string line, std::string stringToFind);
     void pushTheLines(std::string correspPath,
         std::string stringToFind);
 };

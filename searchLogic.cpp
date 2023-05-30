@@ -169,9 +169,9 @@ std::string SearchLogic::getStrings() const
 * Return whether the search word
 * exists in a line.
 ***************************************/
-bool SearchLogic::linehasthestring(const std::string& line, std::string stringToFind)
+bool SearchLogic::linehasthestring(std::string line, std::string stringToFind)
 {
-
+ std::cout << "linehasthestring sees the following 'line' value: \n" + line << std::endl;
     return (line.find(stringToFind) != std::string::npos);
 }
 
@@ -237,56 +237,71 @@ int SearchLogic::prompt(std::string &correspPath)
 * Output to a new file.
 ***************************************/
 void SearchLogic::pushTheLines(std::string correspPath,
-    std::string stringToFind)
+                               std::string stringToFind)
 {
-    std::fstream in;
-    std::string line;
-    std::string replacement = " REDACTED ";
-
-    try
+ std::ifstream in;
+ std::string line;
+ std::string replacement = " REDACTED ";
+ 
+ try
+ {
+  std::cout << "pushTheLines() try block entry\n" << std::endl;
+  std::cout << "The path: " + correspPath << "\n" << std::endl;
+  in.open(correspPath, std::ios::in);
+  
+  while (std::getline(in, line))
+  {
+   std::cout << "The line's value is\n" + line << "\n";
+   std::cout << std::endl;
+   if (linehasthestring(line, stringToFind))
+   {
+    std::string word;
+    std::cout << std::endl;
+    std::cout << "I passed linehasthestring() \n" + line << "and " + stringToFind << std::endl;
+    if (word.length() && word.back() == '.')
     {
-        in.open(correspPath, std::ios::in);
-
-        while (in)
-        {
-            std::getline(in, line);
-            //Test line by outputting its value to console.
-            std::cout << "The line's value is " + line << "\n";
-            if (linehasthestring(line, stringToFind))
-            {
-                std::string word;
-                    if (word.length() && word.back() == '.')
-                    {
-                        word.pop_back();
-                    }
-                    std::regex r("\\b(25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9]?[0-9])\\.(25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9]?[0-9])\\.(25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9]?[0-9])\\.(25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9]?[0-9])\\b");
-                    std::regex m("^([0-9A-Fa-f]{2}[:-]){5}([0-9A-Fa-f]{2})$");
-                    std::smatch match;
-                    auto iter = line.find(word);
-                    while (iter != std::string::npos)
-                    {
-                        if (std::regex_match(word, r) || (std::regex_match(word, m)))
-                        {
-                            size_t s = line.find(word);
-                            line.replace(s, word.length() + 1, replacement);
-                            iter = line.find(word, iter);
-                            std::ofstream out(outPath, std::fstream::app);
-                            out << line << std::endl;
-                            out.close();
-                        }
-                        else
-                        {
-                            std::ofstream out(outPath, std::fstream::app);
-                            out << line << std::endl;
-                        }
-                    }
-                }
-            }
-        }
-    catch (std::exception& e)
-    {
-        std::cout << "Error opening file." << std::endl;
+     word.pop_back();
     }
-    in.close();
+    
+    std::regex r("\\b(25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9]?[0-9])\\.(25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9]?[0-9])\\.(25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9]?[0-9])\\.(25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9]?[0-9])\\b");
+    std::regex m("^([0-9A-Fa-f]{2}[:-]){5}([0-9A-Fa-f]{2})$");
+    std::smatch match;
+    auto iter = line.find(word);
+    std::cout << "Word's value after regex instantiation comprises " + word << std::endl;
+    while (iter != std::string::npos)
+    {
+     std::cout << "I entered the regex loop.\n" << std::endl;
+     std::cout << "Word's value comprises " + word << std::endl;
+     std::cout << std::endl;
+     if (std::regex_match(word, r) || (std::regex_match(word, m)))
+     {
+      std::cout << "I found a matching expression.\n" << std::endl;
+      std::cout << std::endl;
+      size_t s = line.find(word);
+      line.replace(s, word.length() + 1, replacement);
+      iter = line.find(word, iter);
+      std::ofstream out(outPath, std::fstream::app);
+      std::cout << "The output file's location is " + outPath << std::endl;
+      std::cout << std::endl;
+      out << line << std::endl;
+      out.close();
+      break;
+     }
+     else
+     {
+      std::cout << "I didn't find a matching expression\n" << std::endl;
+      std::ofstream out(outPath, std::fstream::app);
+      out << line << std::endl;
+      break;
+     }
+    }
+   }
+  }
+ }
+ catch (std::exception& e)
+ {
+  std::cout << "Error opening file." << std::endl;
+ }
+ in.close();
     
 }

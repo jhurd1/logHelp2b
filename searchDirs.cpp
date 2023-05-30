@@ -110,6 +110,7 @@ SearchDirs::SearchDirs()
      if((entry.path().extension().string() == ".txt") || (entry.path().extension().string() == ".log"))
      {
         SearchLogic sl;
+        correspPath = entry.path();
         sl.pushTheLines(correspPath, *stringToFind);
        }
       }

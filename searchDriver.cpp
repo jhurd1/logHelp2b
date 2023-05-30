@@ -3,6 +3,7 @@
 #include "searchDirs.hpp"
 #include <regex>
 #include <array>
+#include <streambuf>
 
 /* ****************************************
 * SEARCHDRIVER
@@ -20,8 +21,6 @@ int main()
     int j = 0;
     
     try {
-
-       
         std::regex isMacPath("/.*/+");
         std::regex relativePath("^[^/].*");
         std::regex isWindowsPath("[a-zA-Z]:[\\//](?:[a-zA-Z0-9]+[\\/])*([a-zA-Z0-9]+\\.txt)");
@@ -70,6 +69,6 @@ int main()
     {
         std::cout << "searchDriver failed." << std::endl;
     }
-
+    
     return 0;
 }
