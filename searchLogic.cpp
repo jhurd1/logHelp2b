@@ -242,6 +242,7 @@ void SearchLogic::pushTheLines(std::string correspPath,
  std::ifstream in;
  std::string line;
  std::string replacement = " REDACTED ";
+ std::stringstream ss;
  
  try
  {
@@ -268,10 +269,11 @@ void SearchLogic::pushTheLines(std::string correspPath,
     std::smatch match;
     auto iter = line.find(word);
     std::cout << "Word's value after regex instantiation comprises " + word << std::endl;
-    while (iter != std::string::npos)
+    //while (iter != std::string::npos)
+    while (ss >> word)
     {
      std::cout << "I entered the regex loop.\n" << std::endl;
-     std::cout << "Word's value comprises " + word << std::endl;
+     std::cout << "Word's value comprises " << word << std::endl;
      std::cout << std::endl;
      if (std::regex_match(word, r) || (std::regex_match(word, m)))
      {
