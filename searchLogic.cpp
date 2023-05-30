@@ -251,14 +251,10 @@ void SearchLogic::pushTheLines(std::string correspPath,
         {
             std::getline(in, line);
             //Test line by outputting its value to console.
-            std::cout << "Test cout itself." << std::endl;
-            std::cout << "Line's value is " + line << "\n";
+            std::cout << "The line's value is " + line << "\n";
             if (linehasthestring(line, stringToFind))
             {
-                std::istringstream ss(line);
                 std::string word;
-                while (ss >> word)
-                {
                     if (word.length() && word.back() == '.')
                     {
                         word.pop_back();
@@ -287,7 +283,6 @@ void SearchLogic::pushTheLines(std::string correspPath,
                 }
             }
         }
-    }
     catch (std::exception& e)
     {
         std::cout << "Error opening file." << std::endl;
