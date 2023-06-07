@@ -6,6 +6,7 @@
 #include <vector>
 #include "search.hpp"
 #include <map>
+#include <regex>
 
 class SearchLogic
 {
@@ -19,6 +20,7 @@ private:
     Search search;
     std::string arr;
     int j = 0;
+    std::regex isMacPath;
     
 public:
     // Mutators
@@ -50,6 +52,6 @@ public:
     int prompt(std::string &correspPath);
     bool linehasthestring(std::string line, std::string stringToFind);
     void pushTheLines(std::string correspPath,
-        std::string stringToFind);
+        std::string stringToFind, std::string outPath);
 };
 #endif
