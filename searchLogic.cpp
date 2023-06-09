@@ -177,7 +177,7 @@ std::string SearchLogic::getStrings() const
  ***************************************/
 bool SearchLogic::linehasthestring(std::string line, std::string stringToFind)
 {
- std::cout << "linehasthestring sees the following 'line' value: \n" + line << std::endl;
+
  return (line.find(stringToFind) != std::string::npos);
 }
 
@@ -195,7 +195,7 @@ int SearchLogic::prompt(std::string &correspPath)
   std::cout << "Output file path: " << "\n" << std::endl;
   std::cin >> outPath;
   std::cout << std::endl;
-  if(/*!outPath.empty() && */std::regex_match(outPath, isMacPathFile))
+  if(!outPath.empty() && std::regex_match(outPath, isMacPathFile))
   {
    std::cout << "Search word: " << "\n" << std::endl;
    std::cin >> stringToFind;
@@ -221,7 +221,7 @@ int SearchLogic::prompt(std::string &correspPath)
    l.setLogger(mes);
    std::cout << mes << std::endl;
    FILE *pFile;
-   pFile = fopen("/users/jamiehurd/desktop/temp/logfile.log/", "w");
+   pFile = fopen("/Users/jamiehurd/desktop/temp/logfile.log", "w");
    if(pFile != NULL)
    {
     char const *temp = mes->c_str();
@@ -251,59 +251,59 @@ void SearchLogic::pushTheLines(std::string correspPath,
  std::string line;
  std::string replacement = " REDACTED ";
  std::stringstream ss;
+ 
+ // IPv4 address.
  std::regex r("\\b(25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9]?[0-9])\\.(25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9]?[0-9])\\.(25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9]?[0-9])\\.(25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9]?[0-9])\\b");
+ 
+ // MAC address.
  std::regex m("^([0-9A-Fa-f]{2}[:-]){5}([0-9A-Fa-f]{2})$");
+ 
  std::string word;
  auto iter = line.find(word);
  std::smatch match;
  
  try
  {
-  std::cout << "pushTheLines() try block entry\n" << std::endl;
-  std::cout << "The path: " + correspPath << "\n" << std::endl;
+
   in.open(correspPath, std::ios::in);
-  
+  // MY THEORY: GETLINE FAILS TO READ EVERY LINE.
   while (std::getline(in, line))
   {
-   std::cout << "The line's value is\n" + line << "\n";
-   std::cout << std::endl;
+   
    if (linehasthestring(line, stringToFind))
    {
-    std::cout << std::endl;
-    std::cout << "I passed linehasthestring() \n" + line << "and " + stringToFind << std::endl;
+
     if (word.length() && word.back() == '.')
     {
-     word.pop_back(); // Does not retain its new comma-less value afterward.
-     std::cout << "Word's new value after 'popping off the dot or period: '" << word << std::endl;
+     word.pop_back();
+
     }
     else
     {
      while (in >> word)
      {
-      std::cout << "I entered the regex loop.\n" << std::endl;
-      std::cout << "Word's value comprises " << word << std::endl;
+      
       std::cout << std::endl;
       if (std::regex_match(word, r) || (std::regex_match(word, m)))
       {
-       std::cout << "I found a matching expression.\n" << std::endl;
+
        std::cout << std::endl;
        size_t s = line.find(word);
-       std::cout << "Can I see 'replacement's' value? " << replacement << std::endl;
+
        line.replace(s, word.length() + 1, replacement);
        iter = line.find(word, iter);
        std::ofstream out(outPath, std::fstream::app);
-       std::cout << "The output file's location is " << outPath << std::endl;
-       std::cout << std::endl;
-       out << line << std::endl;
-       out.close();
-       //break;
+
+       if (in.is_open())
+       {
+        // Currently, MACs and IPs appear in eight places in the test directory and subdirectories.
+        out << line << std::endl;
+        out.close();
+       }
       }
       else
       {
-       std::cout << "I didn't find a matching expression\n" << std::endl;
-       std::ofstream out(outPath, std::fstream::app);
-       out << line << std::endl;
-       //break;
+       std::cout << "\n" << std::endl;
       }
      }
     }
@@ -312,7 +312,7 @@ void SearchLogic::pushTheLines(std::string correspPath,
  }
  catch (std::exception& e)
  {
-  std::cout << "I threw an exception from pushTheLines()." << std::endl;
+  std::cout << "pushTheLines() exception." << std::endl;
  }
  in.close();
  

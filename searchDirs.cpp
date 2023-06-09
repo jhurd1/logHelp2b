@@ -111,6 +111,7 @@ SearchDirs::SearchDirs()
      {
         SearchLogic sl;
         correspPath = entry.path();
+        std::cout << correspPath << std::endl;
         sl.pushTheLines(correspPath, *stringToFind, outPath);
        }
       }
