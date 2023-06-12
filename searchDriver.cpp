@@ -30,9 +30,9 @@ int main()
         std::cin >> correspPath;
         std::cout << std::endl;
        
-        if (std::regex_match(correspPath, isMacPath))
+        /*if (std::regex_match(correspPath, isMacPath))
         {
-            std::cout << "You truly seek the holy grail." << "\n" << "\n" << std::endl;
+            //std::cout << "You truly seek the holy grail." << "\n" << "\n" << std::endl;
         }
         else if (std::regex_match(correspPath, isWindowsPath))
         {
@@ -42,7 +42,7 @@ int main()
         {
             std::cout << "Path failed." << std::endl;
             main();
-        }
+        }*/
 
         std::cout << "\n" << "Select the quantity of words--up to three:" << std::endl;
         std::cin >> wordQuantity;

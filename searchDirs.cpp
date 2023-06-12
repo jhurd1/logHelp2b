@@ -101,23 +101,30 @@ SearchDirs::SearchDirs()
 * Drill into subdirectories
 * Call partner function, pushTheLines()
 ***************************************/
- void SearchDirs::dirContents(std::string correspPath, std::string *stringToFind, std::string outPath)
+void SearchDirs::dirContents(std::string correspPath, std::string *stringToFind, std::string outPath)
+{
+ try
  {
-  try
+  for(const auto &entry : std::filesystem::recursive_directory_iterator(correspPath))
   {
-   for(const auto &entry : std::filesystem::recursive_directory_iterator(correspPath))
+   std::cout << entry.path() << std::endl;
+
+   if (entry.is_regular_file())
    {
-     if((entry.path().extension().string() == ".txt") || (entry.path().extension().string() == ".log"))
-     {
-        SearchLogic sl;
-        correspPath = entry.path();
-        std::cout << correspPath << std::endl;
-        sl.pushTheLines(correspPath, *stringToFind, outPath);
-       }
-      }
-  } catch (std::exception &e)
-  {
-   std::cout << "Recursive iteration failed from dirContents() in searchDirs" << std::endl;
+    SearchLogic sl;
+    correspPath = entry.path();
+    std::filesystem::path path(correspPath);
+    std::string dir = path.parent_path().string();
+    std::string file = path.filename().string();
+    if ((file != ".DS_Store") && (file.substr(file.find_last_of(".") + 1) != "docx"))
+    {
+         sl.pushTheLines(correspPath, *stringToFind, outPath);
+    }
+   }
   }
+ } catch (std::exception &e)
+ {
+  std::cout << "Recursive iteration failed from dirContents() in searchDirs" << std::endl;
  }
+}
     

@@ -177,7 +177,7 @@ std::string SearchLogic::getStrings() const
  ***************************************/
 bool SearchLogic::linehasthestring(std::string line, std::string stringToFind)
 {
-
+ std::cout << line << std::endl;
  return (line.find(stringToFind) != std::string::npos);
 }
 
@@ -194,14 +194,16 @@ int SearchLogic::prompt(std::string &correspPath)
  {
   std::cout << "Output file path: " << "\n" << std::endl;
   std::cin >> outPath;
-  std::cout << std::endl;
+
   if(!outPath.empty() && std::regex_match(outPath, isMacPathFile))
   {
-   std::cout << "Search word: " << "\n" << std::endl;
+   std::cout << "\n" << "Search word: " << "\n" << std::endl;
    std::cin >> stringToFind;
+   
    for (int i = 0; i <= j; i++)
    {
     stringsToFind[i] = &stringToFind;
+    std::cout << j << std::endl; // Currently, j doesn't return the correct quantity of words to search.
     if (std::regex_match(stringToFind, isnumber))
     {
      std::cout << "Inappropriate data type for input." << std::endl;
@@ -216,10 +218,10 @@ int SearchLogic::prompt(std::string &correspPath)
   {
    Logger l;
    std::string *mes = nullptr;
-   std::string test = "ERROR: The program won't use this type of file.";
+   std::string test = "ERROR: The file path input appears erroneous.";
    mes = &test;
    l.setLogger(mes);
-   std::cout << mes << std::endl;
+
    FILE *pFile;
    pFile = fopen("/Users/jamiehurd/desktop/temp/logfile.log", "w");
    if(pFile != NULL)
@@ -231,7 +233,7 @@ int SearchLogic::prompt(std::string &correspPath)
   }
  } catch (std::exception &e)
  {
-  std::cout << "" << std::endl;
+  std::cout << "Prompt() reached an exception." << std::endl;
  }
  return j;
 }
@@ -264,47 +266,42 @@ void SearchLogic::pushTheLines(std::string correspPath,
  
  try
  {
-
+  
   in.open(correspPath, std::ios::in);
-  // MY THEORY: GETLINE FAILS TO READ EVERY LINE.
+  
   while (std::getline(in, line))
   {
    
    if (linehasthestring(line, stringToFind))
    {
-
-    if (word.length() && word.back() == '.')
+    
+    while (in >> word)
     {
-     word.pop_back();
-
-    }
-    else
-    {
-     while (in >> word)
+     if (word.length() && word.back() == '.')
      {
+      word.pop_back();
+     }
+     if (std::regex_match(word, r) || (std::regex_match(word, m)))
+     {
+      // Stores the line in an unsigned integer array
+      // and finds the word within that line.
+      size_t s = line.find(word);
       
-      std::cout << std::endl;
-      if (std::regex_match(word, r) || (std::regex_match(word, m)))
+      line.replace(s, word.length() + 1, replacement);
+      iter = line.find(word, iter);
+      std::cout << iter << std::endl;
+      std::ofstream out(outPath, std::fstream::app);
+      
+      if (in.is_open())
       {
-
-       std::cout << std::endl;
-       size_t s = line.find(word);
-
-       line.replace(s, word.length() + 1, replacement);
-       iter = line.find(word, iter);
-       std::ofstream out(outPath, std::fstream::app);
-
-       if (in.is_open())
-       {
-        // Currently, MACs and IPs appear in eight places in the test directory and subdirectories.
-        out << line << std::endl;
-        out.close();
-       }
+       // Currently, MACs and IPs appear in eight places in the test directory and subdirectories.
+       out << line << std::endl;
+       out.close();
       }
-      else
-      {
-       std::cout << "\n" << std::endl;
-      }
+     }
+     else
+     {
+      // Do something.
      }
     }
    }
