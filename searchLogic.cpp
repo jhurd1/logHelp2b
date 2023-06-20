@@ -6,13 +6,15 @@
 #include <regex>
 #include <cctype>
 #include <array>
+#include <string>
+#include <vector>
 #include "searchDirs.hpp"
 #include "Logger.h"
 
-
 /****************************
-* DATA MEMBERS
-*****************************/
+ * DATA MEMBERS
+ *****************************/
+
 std::regex isMacPathFile("^/([A-Za-z0-9]+(/[A-Za-z0-9]+)+)\\.[A-Za-z0-9]+$");
 
 
@@ -39,35 +41,25 @@ SearchLogic::SearchLogic(std::string *correspPath)
 /*****************
  * Non-default
  ******************/
-SearchLogic::SearchLogic(std::string correspPath, std::string stringToFind,
+SearchLogic::SearchLogic(std::string correspPath,
                          std::string& replacement)
 {
  setcorrespPath(&correspPath);
- setstringToFind(stringToFind);
+ //setStoreWords(storeWords);
  setreplacement(replacement);
 }
 
 /* *******************************
  * MUTATORS
  *********************************/
- 
+
 /*****************
  * setcorrespPath
  ******************/
 void SearchLogic::setcorrespPath(std::string *correspPath)
 {
  *correspPath = search.getPath();
- //this->correspPath = search.getPath();
 }
-
-/*****************
- * setstringtofind
- ******************/
-void SearchLogic::setstringToFind(std::string stringToFind)
-{
- this->stringToFind = stringToFind;
-}
-
 /*****************
  * setline
  ******************/
@@ -99,18 +91,10 @@ void SearchLogic::setJ(int j)
  this->j = j;
 }
 
-/**************************
- * setStringsToFind
- * To get this to work as
- * expected, check on
- * correct assignment
- * during debug.
- **************************/
-void SearchLogic::setStringsToFind(std::string stringsToFind)
+/*void SearchLogic::setStoreWords(std::vector<std::string> *storeWords)
 {
- int i = 0;
- this->stringsToFind[i] = &stringToFind;
-}
+ this->storeWords = storeWords;
+}*/
 
 /* *******************************
  * ACCESSORS
@@ -122,14 +106,6 @@ void SearchLogic::setStringsToFind(std::string stringsToFind)
 std::string SearchLogic::getcorrespPath() const
 {
  return *correspPath;
-}
-
-/*****************
- * getstringtofind
- ******************/
-std::string SearchLogic::getstringToFind() const
-{
- return stringToFind;
 }
 
 std::string SearchLogic::getoutpath() const
@@ -161,25 +137,10 @@ int SearchLogic::getJ() const
  return j;
 }
 
-/**************************
- * getStrings()
- **************************/
-std::string SearchLogic::getStrings() const
-{
- int i = 0;
- return *stringsToFind[i];
-}
-
-/* **********************************
- * LINEHASTHESTRING
- * Return whether the search word
- * exists in a line.
- ***************************************/
-bool SearchLogic::linehasthestring(std::string line, std::string stringToFind)
-{
- std::cout << line << std::endl;
- return (line.find(stringToFind) != std::string::npos);
-}
+ /*std::vector<std::string> SearchLogic::getStoredWords() const
+ {
+  return *storeWords;
+ }*/
 
 /* *******************************
  * OTHER DATA MEMBERS
@@ -189,47 +150,17 @@ int SearchLogic::prompt(std::string &correspPath)
 {
  SearchDirs searchDirs;
  std::regex isnumber("^-?\\d+");
-
+ 
  try
  {
   std::cout << "Output file path: " << "\n" << std::endl;
   std::cin >> outPath;
-
+  
   if(!outPath.empty() && std::regex_match(outPath, isMacPathFile))
   {
-   std::cout << "\n" << "Search word: " << "\n" << std::endl;
-   std::cin >> stringToFind;
-   
-   for (int i = 0; i <= j; i++)
-   {
-    stringsToFind[i] = &stringToFind;
-    std::cout << j << std::endl; // Currently, j doesn't return the correct quantity of words to search.
-    if (std::regex_match(stringToFind, isnumber))
-    {
-     std::cout << "Inappropriate data type for input." << std::endl;
-     return 1;
-    }
-    else
-    {
-     searchDirs.dirContents(correspPath, &stringToFind, outPath);
-    }
-   }
-  } else
-  {
-   Logger l;
-   std::string *mes = nullptr;
-   std::string test = "ERROR: The file path input appears erroneous.";
-   mes = &test;
-   l.setLogger(mes);
-
-   FILE *pFile;
-   pFile = fopen("/Users/jamiehurd/desktop/temp/logfile.log", "w");
-   if(pFile != NULL)
-   {
-    char const *temp = mes->c_str();
-    fputs(temp, pFile);
-    fclose(pFile);
-   }
+     //searchDirs.dirContents(correspPath, outPath);
+     pushTheLines(correspPath, outPath);
+     
   }
  } catch (std::exception &e)
  {
@@ -245,14 +176,10 @@ int SearchLogic::prompt(std::string &correspPath)
  * Overwrite as needed
  * Output to a new file.
  ***************************************/
-void SearchLogic::pushTheLines(std::string correspPath,
-                               std::string stringToFind,
-                               std::string outPath)
+void SearchLogic::pushTheLines(std::string correspPath, std::string outPath)
 {
- std::ifstream in;
- std::string line;
  std::string replacement = " REDACTED ";
- std::stringstream ss;
+ std::ofstream out(outPath);
  
  // IPv4 address.
  std::regex r("\\b(25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9]?[0-9])\\.(25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9]?[0-9])\\.(25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9]?[0-9])\\.(25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9]?[0-9])\\b");
@@ -261,56 +188,62 @@ void SearchLogic::pushTheLines(std::string correspPath,
  std::regex m("^([0-9A-Fa-f]{2}[:-]){5}([0-9A-Fa-f]{2})$");
  
  std::string word;
- auto iter = line.find(word);
  std::smatch match;
  
- try
+ for(const auto &entry : std::filesystem::recursive_directory_iterator(correspPath))
  {
+  //std::cout << entry.path() << std::endl;
   
-  in.open(correspPath, std::ios::in);
-  
-  while (std::getline(in, line))
+  if (entry.is_regular_file())
   {
-   
-   if (linehasthestring(line, stringToFind))
+   SearchLogic sl;
+   correspPath = entry.path();
+   std::filesystem::path path(correspPath);
+   std::string file = path.filename().string();
+   if ((file != ".DS_Store") && (file.substr(file.find_last_of(".") + 1) != "docx"))  
    {
-    
-    while (in >> word)
+    std::vector<std::string> storeWords(100);
+    try
     {
-     if (word.length() && word.back() == '.')
-     {
-      word.pop_back();
-     }
-     if (std::regex_match(word, r) || (std::regex_match(word, m)))
-     {
-      // Stores the line in an unsigned integer array
-      // and finds the word within that line.
-      size_t s = line.find(word);
-      
-      line.replace(s, word.length() + 1, replacement);
-      iter = line.find(word, iter);
-      std::cout << iter << std::endl;
-      std::ofstream out(outPath, std::fstream::app);
-      
-      if (in.is_open())
+     std::ifstream in;
+     in.open(correspPath, std::ios::in);
+
+      while (in >> word)
       {
-       // Currently, MACs and IPs appear in eight places in the test directory and subdirectories.
-       out << line << std::endl;
-       out.close();
+       
+       if (word.length() && word.back() == '.')
+       {
+        word.pop_back();
+       }
+       
+       if ((std::regex_match(word, r) || (std::regex_match(word, m))))
+       {
+        word = replacement;
+        
+        storeWords.push_back(word);
+       } else
+       {
+        
+        storeWords.push_back(word);
+       }
+       if (out.is_open())
+      //for (const std::string& words : *storeWords) out << words; // Throws exception.
+      for (std::size_t i = 0; i < storeWords.size(); ++i)
+      {
+       out << word;
       }
      }
-     else
-     {
-      // Do something.
-     }
+
+      in.close();
+    }
+    catch (std::exception& e)
+    {
+     std::cout << "pushTheLines() exception." << std::endl;
     }
    }
   }
  }
- catch (std::exception& e)
- {
-  std::cout << "pushTheLines() exception." << std::endl;
- }
- in.close();
- 
+ out.open(outPath, std::ios::out);
+  
+ out.close();
 }
