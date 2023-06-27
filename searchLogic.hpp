@@ -49,5 +49,6 @@ public:
     int prompt(std::string &correspPath);
     //bool linehasthestring(std::string line, std::string stringToFind);
     void pushTheLines(std::string correspPath, std::string outPath);
+    void testReadAndWrite(std::string correspPath, std::string outPath);
 };
 #endif

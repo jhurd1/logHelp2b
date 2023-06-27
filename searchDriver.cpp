@@ -26,15 +26,22 @@ int main()
 
         std::cout << "Enter the file path to search ending with a '/': ";
         std::cin >> correspPath;
-        std::cout << std::endl;
-        std::cout << std::endl;
-  
-        logic.prompt(correspPath);
+        std::cout << "\n" << std::endl;
+        
+        if (std::regex_match(correspPath, isMacPath))
+        {
+         logic.prompt(correspPath);
+        }
+        else
+        {
+         std::cout << "A bad path has resulted in an inoperable condition." << std::endl;
+        }
+        
     }
     catch (std::exception& e)
     {
         std::cout << "searchDriver failed." << std::endl;
     }
-    
+   
     return 0;
 }

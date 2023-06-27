@@ -22,9 +22,15 @@ SearchDirs::SearchDirs()
  
 }
 
-/********************
+/**************************
 * Non-default, one.
-*********************/
+* Note: The colon
+* following the signature
+* prevents the invocation
+* of the default constructor.
+* It intializes members before
+* the body executes.
+***************************/
  SearchDirs::SearchDirs(std::string correspPath, SearchLogic s) : s(s)
  {
   setcorrespPath(correspPath);
@@ -33,11 +39,12 @@ SearchDirs::SearchDirs()
  /*******************
 * Non-default, two.
 *********************/
- SearchDirs::SearchDirs(std::string correspPath, std::string *stringToFind,
+ SearchDirs::SearchDirs(std::string correspPath, int depth,
   SearchLogic s) : s(s)
  {
   setcorrespPath(correspPath);
   //setstringtoFind(stringToFind);
+  setDepth(depth);
  }
  
 /* *******************************
@@ -53,6 +60,14 @@ SearchDirs::SearchDirs()
  }
  
  /*******************
+* setSayWhen
+********************/
+  void SearchDirs::setSayWhen(bool sayWhen)
+  {
+   this->sayWhen = sayWhen;
+  }
+ 
+ /*******************
 * setstringtofind
 *********************/
  /*void SearchDirs::setstringtoFind(std::string *stringToFind)
@@ -62,6 +77,15 @@ SearchDirs::SearchDirs()
   t = s.getstringToFind();
   this->stringToFind = &t;
  }*/
+ 
+ /******************************
+ * setDepth()
+ *******************************/
+ void SearchDirs::setDepth(int depth)
+ {
+  this->depth = depth;
+ }
+ 
  
 /* *******************************
 * ACCESSORS
@@ -91,6 +115,23 @@ SearchDirs::SearchDirs()
   return stringInFile;
  }
  
+/********************
+* getSayWhen()
+**********************/
+bool SearchDirs::getSayWhen() const
+{
+ return sayWhen;
+}
+ 
+ /*******************************
+ * getDepth()
+ *******************************/
+ int SearchDirs::getDepth() const
+ {
+  return depth;
+ }
+ 
+ 
  /* *******************************
 * OTHER DATA MEMBERS
 **********************************/
@@ -103,24 +144,39 @@ SearchDirs::SearchDirs()
 ***************************************/
 void SearchDirs::dirContents(std::string correspPath, std::string outPath)
 {
+ for (const auto &initEntry : std::filesystem::recursive_directory_iterator(correspPath))
+ {
+  depth++;
+  setDepth(depth);
+ }
+ 
+ std::cout << "Depth: " << " " << depth << std::endl;
+ 
  try
  {
- /* for(const auto &entry : std::filesystem::recursive_directory_iterator(correspPath))
+ // Use a marker to the end of the loop to signal pushTheLines when to close the in stream.
+ for(const auto &entry : std::filesystem::recursive_directory_iterator(correspPath))
   {
-   std::cout << entry.path() << std::endl;
-
-   if (entry.is_regular_file())
-   {
-    SearchLogic sl;
-    correspPath = entry.path();
-    std::filesystem::path path(correspPath);
-    std::string file = path.filename().string();
-    if ((file != ".DS_Store") && (file.substr(file.find_last_of(".") + 1) != "docx"))
+   // Gives the custom depth at the end of the run.
+   // Report the depth.
+   // Reveal the depth.
+   // Hold the depth in memory.
+   // If, from SearchLogic, a count exceeds depth from this class, close the stream.
+    if (entry.is_regular_file())
     {
+     {
+      SearchLogic sl;
+      correspPath = entry.path();
+      std::filesystem::path path(correspPath);
+      std::string file = path.filename().string();
+     if ((file != ".DS_Store") && (file.substr(file.find_last_of(".") + 1) != "docx"))
+     {
       sl.pushTheLines(correspPath, outPath);
      }
+    }
+    }
    }
-  }*/
+
  } catch (std::exception &e)
  {
   std::cout << "Recursive iteration failed from dirContents() in searchDirs" << std::endl;

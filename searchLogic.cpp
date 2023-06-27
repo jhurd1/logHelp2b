@@ -160,6 +160,7 @@ int SearchLogic::prompt(std::string &correspPath)
   {
      //searchDirs.dirContents(correspPath, outPath);
      pushTheLines(correspPath, outPath);
+     //testReadAndWrite(correspPath, outPath);
      
   }
  } catch (std::exception &e)
@@ -180,7 +181,6 @@ void SearchLogic::pushTheLines(std::string correspPath, std::string outPath)
 {
  std::string replacement = " REDACTED ";
  std::ofstream out(outPath);
- 
  // IPv4 address.
  std::regex r("\\b(25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9]?[0-9])\\.(25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9]?[0-9])\\.(25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9]?[0-9])\\.(25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9]?[0-9])\\b");
  
@@ -190,27 +190,25 @@ void SearchLogic::pushTheLines(std::string correspPath, std::string outPath)
  std::string word;
  std::smatch match;
  
- for(const auto &entry : std::filesystem::recursive_directory_iterator(correspPath))
+ int n = 0;
+ std::vector<std::string> storeWords(n);
+ 
+ try
  {
-  //std::cout << entry.path() << std::endl;
-  
-  if (entry.is_regular_file())
+  for(const auto &entry : std::filesystem::recursive_directory_iterator(correspPath))
   {
-   SearchLogic sl;
-   correspPath = entry.path();
-   std::filesystem::path path(correspPath);
-   std::string file = path.filename().string();
-   if ((file != ".DS_Store") && (file.substr(file.find_last_of(".") + 1) != "docx"))  
+   if (entry.is_regular_file())
    {
-    std::vector<std::string> storeWords(100);
-    try
     {
-     std::ifstream in;
-     in.open(correspPath, std::ios::in);
-
+     correspPath = entry.path();
+     std::filesystem::path path(correspPath);
+     std::string file = path.filename().string();
+     if ((file != ".DS_Store") && (file.substr(file.find_last_of(".") + 1) != "docx"))
+     {
+      std::ifstream in(correspPath);
+      // CTL + i to reformat code in Xcode.
       while (in >> word)
       {
-       
        if (word.length() && word.back() == '.')
        {
         word.pop_back();
@@ -226,24 +224,48 @@ void SearchLogic::pushTheLines(std::string correspPath, std::string outPath)
         
         storeWords.push_back(word);
        }
-       if (out.is_open())
-      //for (const std::string& words : *storeWords) out << words; // Throws exception.
-      for (std::size_t i = 0; i < storeWords.size(); ++i)
-      {
-       out << word;
       }
+      if (out.is_open())
+      {
+       
+      }
+       in.close();
      }
-
-      in.close();
-    }
-    catch (std::exception& e)
-    {
-     std::cout << "pushTheLines() exception." << std::endl;
     }
    }
   }
+  // Iterate over the vector and write.
+  for (const std::string& words : storeWords) out << " " << words;
  }
- out.open(outPath, std::ios::out);
-  
+ catch (std::exception& e)
+ {
+  std::cout << "pushTheLines() exception." << std::endl;
+ }
+ 
  out.close();
+}
+
+/* **********************************
+ * TEST WRITE
+ ***************************************/
+
+void SearchLogic::testReadAndWrite(std::string correspPath, std::string outPath)
+{
+     std::fstream in;
+     std::string testWord, inFile;
+     correspPath = "/Users/jamiehurd/Desktop/temp/test.log";
+     
+     in.open(correspPath);
+     
+     std::ofstream outty(outPath);
+     
+     while (in >> testWord)
+     {
+      std::cout << testWord << std::endl;
+      //outty.open(outPath); // Opening outty causes the program not to write anything.
+      outty << " " << testWord;
+     }
+     
+     in.close();
+     outty.close();
 }
