@@ -8,7 +8,6 @@
 #include <array>
 #include <string>
 #include <vector>
-#include "searchDirs.hpp"
 #include "Logger.h"
 
 /****************************
@@ -148,7 +147,6 @@ int SearchLogic::getJ() const
  **********************************/
 int SearchLogic::prompt(std::string &correspPath)
 {
- SearchDirs searchDirs;
  std::regex isnumber("^-?\\d+");
  
  try
@@ -158,7 +156,6 @@ int SearchLogic::prompt(std::string &correspPath)
   
   if(!outPath.empty() && std::regex_match(outPath, isMacPathFile))
   {
-     //searchDirs.dirContents(correspPath, outPath);
      pushTheLines(correspPath, outPath);
      //testReadAndWrite(correspPath, outPath);
      
@@ -205,8 +202,9 @@ void SearchLogic::pushTheLines(std::string correspPath, std::string outPath)
      std::string file = path.filename().string();
      if ((file != ".DS_Store") && (file.substr(file.find_last_of(".") + 1) != "docx"))
      {
+      n++; //Proves necessary to coerce the vector into holding everything.
       std::ifstream in(correspPath);
-      // CTL + i to reformat code in Xcode.
+
       while (in >> word)
       {
        if (word.length() && word.back() == '.')
@@ -262,7 +260,7 @@ void SearchLogic::testReadAndWrite(std::string correspPath, std::string outPath)
      while (in >> testWord)
      {
       std::cout << testWord << std::endl;
-      //outty.open(outPath); // Opening outty causes the program not to write anything.
+
       outty << " " << testWord;
      }
      

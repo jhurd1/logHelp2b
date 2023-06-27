@@ -1,8 +1,8 @@
 #include <iostream>
 #include <string>
-#include "searchDirs.hpp"
 #include <regex>
 #include <array>
+#include "searchLogic.hpp"
 #include <streambuf>
 
 /* ****************************************
@@ -14,7 +14,6 @@
 int main()
 {
     SearchLogic logic;
-    SearchDirs searchDirs;
     std::string word;
     std::string correspPath;
     
